@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zweedse Kruiswoordpuzzel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 50px);
+            gap: 2px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border: 1px solid #000;
+            background-color: #fff;
+        }
+        .clue {
+            font-size: 14px;
+            color: #333;
+            margin-top: 10px;
+        }
+        .error {
+            background-color: #ffcccc;
+        }
+        .correct {
+            background-color: #ccffcc;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Zweedse Kruiswoordpuzzel</h2>
+    <div class="grid" id="grid"></div>
+    <div class="clue" id="clue"></div>
+    <button onclick="checkAnswers()">Controleer</button>
+    <button onclick="giveHint()">Hint</button>
+
+    <script>
+        const gridData = [
+            ['H', 'O', 'N', 'D', ''],
+            ['', '', '', 'A', ''],
+            ['', 'K', 'A', 'T', ''],
+            ['', '', '', '', ''],
+            ['', 'V', 'I', 'S', '']
+        ];
+
+        const clues = {
+            "0-0": "Dier dat blaft",
+            "2-1": "Miauwend huisdier",
+            "4-1": "Dier dat in water leeft"
+        };
+
+        const solution = [
+            ['H', 'O', 'N', 'D', ''],
+            ['', '', '', 'A', ''],
+            ['', 'K', 'A', 'T', ''],
+            ['', '', '', '', ''],
+            ['', 'V', 'I', 'S', '']
+        ];
+
+        function createGrid() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 5; col++) {
+                    let cell = document.createElement('input');
+                    cell.type = 'text';
+                    cell.maxLength = 1;
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    
+                    if (gridData[row][col] !== '') {
+                        cell.addEventListener('focus', showClue);
+                        cell.addEventListener('input', moveNext);
+                    } else {
+                        cell.style.backgroundColor = "#ccc";
+                        cell.disabled = true;
+                    }
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        function showClue(event) {
+            const row = event.target.dataset.row;
+            const col = event.target.dataset.col;
+            const key = `${row}-${col}`;
+            document.getElementById('clue').textContent = clues[key] || '';
+        }
+
+        function checkAnswers() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                const row = cell.dataset.row;
+                const col = cell.dataset.col;
+                if (solution[row][col] && cell.value.toUpperCase() === solution[row][col]) {
+                    cell.classList.remove('error');
+                    cell.classList.add('correct');
+                } else {
+                    cell.classList.remove('correct');
+                    if (cell.value !== '') {
+                        cell.classList.add('error');
+                    }
+                }
+            });
+        }
+
+        function giveHint() {
+            const cells = document.querySelectorAll('.cell');
+            for (let cell of cells) {
+                const row = cell.dataset.row;
+                const col = cell.dataset.col;
+                if (cell.value === '') {
+                    cell.value = solution[row][col];
+                    break;
+                }
+            }
+        }
+
+        function moveNext(event) {
+            let current = event.target;
+            let next = current.nextElementSibling;
+            if (next && next.classList.contains('cell')) {
+                next.focus();
+            }
+        }
+
+        createGrid();
+    </script>
+
+</body>
+</html>
